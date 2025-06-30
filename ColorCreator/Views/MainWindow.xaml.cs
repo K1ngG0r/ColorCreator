@@ -1,6 +1,5 @@
 ﻿using System.Windows;
 
-
 namespace ColorCreator
 {
     public partial class MainWindow : Window
@@ -11,9 +10,9 @@ namespace ColorCreator
         {
             _ColorViewModel = new ColorViewModel();
 
-            DataContext = _ColorViewModel;
-
             InitializeComponent();
+
+            DataContext = _ColorViewModel;
         }
     }
 }
