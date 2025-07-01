@@ -2,60 +2,47 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Windows.Data;
 using System.Windows.Media;
 
-namespace ColorCreator
+namespace ColorCreator.ViewModels
 {
     public class ColorViewModel :INotifyPropertyChanged
     {
-
-        //Цвета и их свойства
-        private byte _alpha = 255;
         public byte Alpha
         {
             get => _alpha;
             set { _alpha = value; UpdatePreview(); OnPropertyChanged(); }
         }
 
-        private byte _red = 0;
         public byte Red
         {
             get => _red;
             set { _red = value; UpdatePreview(); OnPropertyChanged(); }
         }
 
-        private byte _green = 0;
         public byte Green
         {
             get => _green;
             set { _green = value; UpdatePreview(); OnPropertyChanged(); }
         }
 
-        private byte _blue = 0;
         public byte Blue
         {
             get => _blue;
             set { _blue = value; UpdatePreview(); OnPropertyChanged(); }
         }
 
-        //Временный цвет
-        private SolidColorBrush _previewBrush = Brushes.Black;
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public SolidColorBrush PreviewBrush
         {
             get => _previewBrush;
             set { _previewBrush = value; OnPropertyChanged(); }
         }
-        private void UpdatePreview()
-        {
-            var color = Color.FromArgb(Alpha, Red, Green, Blue);
-            PreviewBrush = new SolidColorBrush(color);
-        }
 
-        public ObservableCollection<ItemColor> Items { get; } =
+        public ObservableCollection<ItemColor> Colors { get; } =
                 new ObservableCollection<ItemColor>();
 
-        private ItemColor _selectedColor;
         public ItemColor SelectedColor
         {
             get => _selectedColor;
@@ -66,81 +53,64 @@ namespace ColorCreator
             }
         }
 
-        private RelayCommand _addCommand;
         public RelayCommand AddCommand
         {
             get
             {
-                return _addCommand ?? (_addCommand =
-                    new RelayCommand
-                    (
-                        obj =>
-                        {
-                            _AddColor(Alpha, Red, Green, Blue);
-
-                            OnPropertyChanged();
-                        },
-                        obj =>
-                        {
-                            return !_ColorExist(Alpha, Red, Green, Blue);
-                        }
-                    ));
+                return _addCommand ?? (_addCommand = new RelayCommand
+                (
+                    obj => {
+                        Colors.Add(new ItemColor(Alpha, Red, Green, Blue));
+                        OnPropertyChanged();
+                    },
+                    obj => { return !IsColorExist(new ItemColor(Alpha, Red, Green, Blue)); }
+                ));
             }
         }
 
-        private RelayCommand _removeCommand;
         public RelayCommand RemoveCommand
         {
             get
             {
-                return _removeCommand ?? (_removeCommand =
-                   new RelayCommand
-                    (
-                        obj =>
-                        {
-                            Items.Remove(SelectedColor);
-
-                            OnPropertyChanged();
-                        },
-                        obj =>
-                        {
-                            return SelectedColor != null;
-                        }
-                    ));
+                return _removeCommand ?? (_removeCommand = new RelayCommand
+                (
+                    obj => {
+                        Colors.Remove(SelectedColor);
+                        OnPropertyChanged();
+                    },
+                    obj => {
+                        return SelectedColor != null;
+                    }
+                ));
             }
         }
 
-        private void _AddColor(byte Alpha, byte Red, byte Green, byte Blue)
+        public bool IsColorExist(ItemColor color)
         {
-
-            Items.Add(new ItemColor
-            {
-                Alpha = Alpha,
-                Red = Red,
-                Green = Green,
-                Blue = Blue
-            });
-        }
-        private bool _ColorExist(byte Alpha, byte Red, byte Green, byte Blue )
-        {
-            ItemColor color = new ItemColor()
-            {
-                Alpha = Alpha,
-                Red = Red,
-                Green = Green,
-                Blue = Blue
-            };
-
-            foreach (var item in Items)
-            {
+            foreach (var item in Colors)
                 if(item.ActualColor == color.ActualColor)
                     return true;
-            }
 
             return false;
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        private byte _alpha = 255;
+        private byte _red = 0;
+        private byte _green = 0;
+        private byte _blue = 0;
+
+        private SolidColorBrush _previewBrush = Brushes.Black;
+        private ItemColor _selectedColor;
+
+        private RelayCommand _addCommand;
+        private RelayCommand _removeCommand;
+
+        private void UpdatePreview()
+        {
+            var color = Color.FromArgb(Alpha, Red, Green, Blue);
+            PreviewBrush = new SolidColorBrush(color);
+        }
+
         protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

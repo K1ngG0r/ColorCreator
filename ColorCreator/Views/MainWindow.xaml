@@ -4,12 +4,13 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ColorCreator" 
-        xmlns:conv="clr-namespace:ColorCreator.Converters"
+        xmlns:conv="clr-namespace:ColorCreator.Converters" 
+        xmlns:local1="clr-namespace:ColorCreator.ViewModels"
         mc:Ignorable="d"
         Title="Color Creator" Height="450" Width="800">
 
     <Window.Resources>
-        <local:ColorViewModel x:Key="Color"/>
+        <local1:ColorViewModel x:Key="Color"/>
         <conv:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
 
         <Style TargetType="CheckBox">
@@ -161,10 +162,11 @@
                     Margin="5,0" Padding="10,2"/>
         </Grid>
 
-        <ListView Grid.Row="1"
-                DataContext="{StaticResource Color}"
-                ItemsSource="{Binding Items}" 
-                SelectedItem="{Binding SelectedColor}">
+        <ListView x:Name="ColorList" 
+                  Grid.Row="1"
+                  DataContext="{StaticResource Color}"
+                  ItemsSource="{Binding Colors}" 
+                  SelectedItem="{Binding SelectedColor}">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <Grid>
@@ -175,16 +177,11 @@
 
                         <TextBlock Grid.Column="0" Text="{Binding HexCode}" Margin="5" FontSize="15" FontFamily="Calibri"/>
 
-                        <!-- Отображение цвета -->
                         <Border  Grid.Column="1" Background="{Binding Converter={StaticResource ColorToBrushConverter}}"
                                             CornerRadius="3" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
-
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-
-
-
     </Grid>
 </Window>
